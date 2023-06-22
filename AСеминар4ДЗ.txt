@@ -1,0 +1,85 @@
+//Код для превращения дерева поиска в полноценное левостороннее красно-черное дерево с методом добавления новых элементов и балансировкой:
+
+public class RedBlackTree<T extends Comparable> {
+    private Node<T> root;
+    private static final boolean RED = true;
+    private static final boolean BLACK = false;
+
+    private class Node<T> {
+        T value;
+        Node<T> left, right;
+        boolean color;
+
+        Node(T value) {
+            this.value = value;
+            this.color = RED;
+        }
+    }
+
+    public void add(T value) {
+        root = add(root, value);
+        root.color = BLACK; // ensure root is always black
+    }
+
+    private Node<T> add(Node<T> node, T value) {
+        if (node == null) {
+            return new Node<>(value);
+        }
+
+        int cmp = value.compareTo(node.value);
+        if (cmp < 0) {
+            node.left = add(node.left, value);
+        } else if (cmp > 0) {
+            node.right = add(node.right, value);
+        } else {
+            // value already exists, do nothing
+            return node;
+        }
+
+        // balance the tree using rotations and color flips
+        if (isRed(node.right) && !isRed(node.left)) {
+            node = rotateLeft(node);
+        }
+        if (isRed(node.left) && isRed(node.left.left)) {
+            node = rotateRight(node);
+        }
+        if (isRed(node.left) && isRed(node.right)) {
+            flipColors(node);
+        }
+
+        return node;
+    }
+
+    private boolean isRed(Node<T> node) {
+        if (node == null) {
+            return false;
+        }
+        return node.color == RED;
+    }
+
+    private Node<T> rotateLeft(Node<T> node) {
+        Node<T> x = node.right;
+        node.right = x.left;
+        x.left = node;
+        x.color = node.color;
+        node.color = RED;
+        return x;
+    }
+
+    private Node<T> rotateRight(Node<T> node) {
+        Node<T> x = node.left;
+        node.left = x.right;
+        x.right = node;
+        x.color = node.color;
+        node.color = RED;
+        return x;
+    }
+
+    private void flipColors(Node<T> node) {
+        node.color = RED;
+        node.left.color = BLACK;
+        node.right.color = BLACK;
+    }
+}
+
+//В данном коде реализовано красно-черное дерево с методом добавления новых элементов и балансировкой. Для добавления новых элементов используется рекурсивный подход. После добавления элемента производится балансировка дерева с помощью левого и правого малых поворотов и смены цвета. Методы isRed, rotateLeft, rotateRight и flipColors используются для балансировки дерева. В итоге, дерево становится полноценным левосторонним красно-черным деревом.
